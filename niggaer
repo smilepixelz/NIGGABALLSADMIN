@@ -1,0 +1,98 @@
+local Admins = {
+    "ahgff_ahdg"
+}
+
+local Prefix = ":"
+
+local Players = game:GetService("Players")
+
+local Commands = {}
+
+local function get_player_from_partial(s)
+    s = s:lower() -- Remove this if you want case sensitivity
+    for _, player in ipairs(Players:GetPlayers()) do
+        if s == player.DisplayName:lower():sub(1, #s) or s == player.Name:lower():sub(1, #s) then
+            return player
+        end
+    end
+    return nil
+end
+
+Commands.form = function(Sender, Arguments)
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Sender.Character.HumanoidRootPart.CFrame
+    game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack.Wallet)
+end
+
+Commands.drop = function(Sender, Arguments)
+    local function ConvertWord2Num (word)
+        if string.find(word, "k") then 
+            local T = string.split(word, "")
+            return T[1].."000"
+        elseif string.find(word, "m") then 
+            local T = string.split(word, "")
+            return T[1].."000000"
+        elseif string.find(word, "b") then 
+            local T = string.split(word, "")
+            return T[1].."0000000"
+        elseif string.find(word, "t") then 
+            local T = string.split(word, "")
+            return T[1].."000000000"
+        elseif not string.find(word, "k") or not string.find(word, "m") or not string.find(word, "b") or not string.find(word, "t") then 
+            return word 
+        end
+    end 
+    
+    local ye = ConvertWord2Num(Arguments[1])
+    
+    while game.Players.LocalPlayer.DataFolder.Currency.Value ~= game.Players.LocalPlayer.DataFolder.Currency.Value - ye do 
+        local args = {
+            [1] = "DropMoney",
+            [2] = math.clamp(ye, "10000")
+        }
+        
+        game:GetService("ReplicatedStorage").MainEvent:FireServer(unpack(args))
+    end
+end
+
+local function IsAdmin(Player)
+    for _, Admin in pairs(Admins) do
+    print(Admin, Player)
+        if type(Admin) == "string" and string.lower(Admin) == string.lower(Player.Name) then
+            return true
+        elseif type(Admin) == "number" and Admin == Player.UserId then
+            return true
+        end
+    end
+    return false
+end
+
+local function ParseMessage(Player, Message)
+    Message = string.lower(Message)
+    local PrefixMatch = string.match(Message, "^" .. Prefix)
+    
+    if PrefixMatch then
+    Message = string.gsub(Message, PrefixMatch, "", 1)
+    local Arguments = {}
+    
+    for Argument in string.gmatch(Message, "[^%s]+") do
+    table.insert(Arguments, Argument)
+    end
+    
+    local CommandName = Arguments[1]
+    table.remove(Arguments, 1)
+    local CommandFunc = Commands[CommandName]
+
+    if CommandFunc ~= nil then
+        CommandFunc(Player, Arguments)
+        end
+    end
+end
+
+for index, Player in pairs(game.Players:GetChildren()) do
+    Player.Chatted:Connect(
+    function(Message, Recipient)
+        if not Recipient and IsAdmin(Player) then
+            ParseMessage(Player, Message)
+        end
+    end)
+end
