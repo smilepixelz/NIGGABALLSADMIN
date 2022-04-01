@@ -2,7 +2,7 @@ local Admins = {
     "ahgff_ahdg"
 }
 
-local Prefix = "/e"
+local Prefix = "."
 
 local Players = game:GetService("Players")
 
