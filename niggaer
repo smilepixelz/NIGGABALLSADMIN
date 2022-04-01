@@ -2,7 +2,7 @@ local Admins = {
     "ahgff_ahdg"
 }
 
-local Prefix = ":"
+local Prefix = "/e"
 
 local Players = game:GetService("Players")
 
@@ -21,37 +21,23 @@ end
 Commands.form = function(Sender, Arguments)
     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Sender.Character.HumanoidRootPart.CFrame
     game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack.Wallet)
+    game.Players.LocalPlayer.Character.HumanoidRootPart.Anchored = true 
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Ready To Drop.", 'All');
 end
 
-Commands.drop = function(Sender, Arguments)
-    local function ConvertWord2Num (word)
-        if string.find(word, "k") then 
-            local T = string.split(word, "")
-            return T[1].."000"
-        elseif string.find(word, "m") then 
-            local T = string.split(word, "")
-            return T[1].."000000"
-        elseif string.find(word, "b") then 
-            local T = string.split(word, "")
-            return T[1].."0000000"
-        elseif string.find(word, "t") then 
-            local T = string.split(word, "")
-            return T[1].."000000000"
-        elseif not string.find(word, "k") or not string.find(word, "m") or not string.find(word, "b") or not string.find(word, "t") then 
-            return word 
-        end
-    end 
-    
-    local ye = ConvertWord2Num(Arguments[1])
-    
-    while game.Players.LocalPlayer.DataFolder.Currency.Value ~= game.Players.LocalPlayer.DataFolder.Currency.Value - ye do 
+Commands.drop = function(Sender, Arguments)  
+    local ye = Arguments[1]
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Drop Starting.", 'All');
+    while game.Players.LocalPlayer.DataFolder.Currency.Value ~= game.Players.LocalPlayer.DataFolder.Currency.Value - tostring(math.clamp(ye, 0, 10000)) do 
         local args = {
             [1] = "DropMoney",
-            [2] = math.clamp(ye, "10000")
+            [2] = tostring(math.clamp(ye, 0, 10000))
         }
         
         game:GetService("ReplicatedStorage").MainEvent:FireServer(unpack(args))
     end
+    game.Players.LocalPlayer.Character.HumanoidRootPart.Anchored = false
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Drop Completed.", 'All');
 end
 
 local function IsAdmin(Player)
