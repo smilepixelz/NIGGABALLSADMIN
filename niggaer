@@ -28,7 +28,7 @@ end
 Commands.drop = function(Sender, Arguments)  
     local ye = Arguments[1]
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Drop Starting.", 'All');
-    while game.Players.LocalPlayer.DataFolder.Currency.Value ~= game.Players.LocalPlayer.DataFolder.Currency.Value - tostring(math.clamp(ye, 0, 10000)) do 
+    while game.Players.LocalPlayer.DataFolder.Currency.Value ~= game.Players.LocalPlayer.DataFolder.Currency.Value - tostring(math.clamp(ye, 0, 10000)) do wait()
         local args = {
             [1] = "DropMoney",
             [2] = tostring(math.clamp(ye, 0, 10000))
